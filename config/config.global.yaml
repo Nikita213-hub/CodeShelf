@@ -1,0 +1,22 @@
+http_server:
+    listen_spec: localhost:8080   #  HTTP listener address string
+    read_timeout: 3600s          #  HTTP read timeout duration in sec - default 60 sec
+    write_timeout: 3600s         #  HTTP write timeout duration in sec - default 60 sec
+    idle_timeout: 3600s          #  HTTP idle timeout duration in sec - default 60 sec
+    shutdown_timeout: 30s       #  service shutdown timeout in sec - default 30 sec
+    max_header_bytes: 262144    #  HTTP max header bytes - default 1 MB
+    use_go_profile: false       #  use Go profiling
+    use_tls: false              #  use Transport Level Security
+    tls_cert_file: ""           #  TLS Certificate file name
+    tls_key_file: ""            #  TLS Private key file name
+    tls_min_version: 0          #  TLS min version VersionTLS13, VersionTLS12, VersionTLS11, VersionTLS10, VersionSSL30
+    tls_max_version: 0          #  TLS max version VersionTLS13, VersionTLS12, VersionTLS11, VersionTLS10, VersionSSL30
+database:
+    connect_string: ""
+    host: ""
+    port: 0
+    db_name: "code_shelf"
+    ssl_mode: 0
+    user: "root"
+    pass: ""
+    driver_name: "pgx"
