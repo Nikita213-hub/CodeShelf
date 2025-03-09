@@ -35,12 +35,12 @@ func NewDaemon(ctx context.Context, cfg *config.Config) (*Daemon, error) {
 	d.ctx, d.cancel = context.WithCancel(ctx)
 	server, err := httpserver.NewHttpServer(ctx, d.cfg.HttpServerCfg)
 	if err != nil {
-		return &Daemon{}, errors.New("error occurred while initializing daemon")
+		return &Daemon{}, errors.New("error occurred while initializing daemon(http server)")
 	}
 	d.httpServer = server
 	dbServ, err := db.NewDbService(ctx, d.cfg.DbCfg)
 	if err != nil {
-		return &Daemon{}, errors.New("error occurred while initializing daemon")
+		return &Daemon{}, err
 	}
 	d.dbService = dbServ
 	return d, nil

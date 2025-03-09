@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	HttpServerCfg *httpserver.HttpCfgRoot
-	DbCfg         *db.Config
+	DbCfg         *db.CfgRoot
 	//...
 }
 
@@ -18,7 +18,9 @@ func NewCfg() *Config {
 		HttpServerCfg: &httpserver.HttpCfgRoot{
 			HttpServerCfg: &httpserver.Config{},
 		},
-		DbCfg: &db.Config{},
+		DbCfg: &db.CfgRoot{
+			DbConfig: &db.Config{},
+		},
 	}
 }
 
@@ -28,6 +30,10 @@ func (c *Config) LoadCfg() error {
 		return err
 	}
 	err = yaml.Unmarshal(yamlData, c.HttpServerCfg)
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(yamlData, c.DbCfg)
 	if err != nil {
 		return err
 	}
