@@ -3,21 +3,21 @@ package httpserver
 import (
 	"context"
 	"fmt"
+	"github.com/Nikita213-hub/CodeShelf/httpservice"
 	"net"
 	"net/http"
 	"time"
 )
 
-type HttpCfgRoot struct {
-	HttpServerCfg *Config `yaml:"http_server"`
-}
 type HttpServer struct {
 	ctx    context.Context
 	cancel context.CancelFunc
-	cfg    *HttpCfgRoot
+	cfg    *Config
 
 	listener net.Listener
 	server   *http.Server
+	Service  *httpservice.Service
+	Mux      *http.ServeMux
 }
 
 type Config struct {
@@ -35,15 +35,23 @@ type Config struct {
 	TLSMaxVersion   uint16        `yaml:"tls_max_version" json:"tls_max_version"`
 }
 
-func NewHttpServer(ctx context.Context, cfg *HttpCfgRoot) (*HttpServer, error) {
+func NewHttpServer(ctx context.Context, cfg *Config, service *httpservice.Service) (*HttpServer, error) {
 	server := &http.Server{
-		Addr: cfg.HttpServerCfg.ListenSpec,
+		Addr: cfg.ListenSpec,
 	}
-	return &HttpServer{
+	httpServer := &HttpServer{
 		ctx:    ctx,
 		cfg:    cfg,
 		server: server,
-	}, nil
+	}
+	httpServer.Mux = http.NewServeMux()
+	httpServer.server.Handler = httpServer.Mux
+	httpServer.Service = service
+	for _, val := range httpServer.Service.Handlers {
+		httpServer.Mux.HandleFunc(val.Path, val.HandleFunc)
+		fmt.Println(val.Name, " is registered")
+	}
+	return httpServer, nil
 }
 
 func (s *HttpServer) Run() error {

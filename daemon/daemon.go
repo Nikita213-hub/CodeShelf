@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Nikita213-hub/CodeShelf/httpservice"
 
 	"github.com/Nikita213-hub/CodeShelf/config"
 	"github.com/Nikita213-hub/CodeShelf/db"
@@ -21,6 +22,8 @@ type Daemon struct {
 	httpServerErrorsCh chan error
 	dbService          *db.Db
 	dbErrorsCh         chan error
+	httpService        *httpservice.Service
+	httpServiceErrCh   chan error
 }
 
 func NewDaemon(ctx context.Context, cfg *config.Config) (*Daemon, error) {
@@ -33,7 +36,12 @@ func NewDaemon(ctx context.Context, cfg *config.Config) (*Daemon, error) {
 		d.ctx, d.cancel = context.WithCancel(context.Background())
 	}
 	d.ctx, d.cancel = context.WithCancel(ctx)
-	server, err := httpserver.NewHttpServer(ctx, d.cfg.HttpServerCfg)
+	var err error
+	d.httpService, err = httpservice.New(ctx, cfg.HttpServiceCfg)
+	if err != nil {
+		return &Daemon{}, err
+	}
+	server, err := httpserver.NewHttpServer(ctx, d.cfg.HttpServerCfg, d.httpService)
 	if err != nil {
 		return &Daemon{}, errors.New("error occurred while initializing daemon(http server)")
 	}

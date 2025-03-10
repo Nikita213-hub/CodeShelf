@@ -18,5 +18,5 @@ database:
     db_name: "code_shelf"
     ssl_mode: "disable"
     user: "postgres"
-    pass: ""
+    pass: "penis"
     driver_name: "pgx"
