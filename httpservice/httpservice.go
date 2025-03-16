@@ -2,6 +2,7 @@ package httpservice
 
 import (
 	"context"
+	"github.com/Nikita213-hub/CodeShelf/db"
 	"net/http"
 )
 
@@ -24,7 +25,7 @@ type Config struct {
 	AuthType string `yaml:"auth_type"`
 }
 
-func New(ctx context.Context, cfg *Config) (*Service, error) {
+func New(ctx context.Context, cfg *Config, strg *db.Db) (*Service, error) {
 	service := &Service{
 		ctx: ctx,
 		cfg: cfg,
@@ -34,6 +35,11 @@ func New(ctx context.Context, cfg *Config) (*Service, error) {
 			"/hello",
 			helloHandler,
 			"hello_handler",
+		},
+		"signup": Handler{
+			"/signup",
+			SignUp(strg),
+			"auth_handler",
 		},
 	}
 	return service, nil
