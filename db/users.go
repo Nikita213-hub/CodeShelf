@@ -7,19 +7,19 @@ import (
 )
 
 func (db *Db) GetUser(username string) (*Models.User, error) {
-	queryString := fmt.Sprintf("SELECT username FROM users WHERE username='%s'", username)
-	tag, err := db.conn.Exec(db.ctx, queryString)
-	fmt.Println(err)
-	if err != nil || tag.RowsAffected() == 0 {
+	queryString := fmt.Sprintf("SELECT * FROM users WHERE username='%s'", username)
+	r := db.conn.QueryRow(db.ctx, queryString)
+	var user Models.User
+	err := r.Scan(&user.Id, &user.Username, &user.Password)
+	if err != nil {
 		return nil, err
 	}
-	fmt.Println(tag.RowsAffected())
-	_ = tag
-	return &Models.User{}, nil
+	fmt.Println(user)
+	return &user, nil
 }
 
-func (db *Db) AddUser(username string) (*Models.User, error) {
-	queryString := fmt.Sprintf("INSERT INTO users(username) VALUES('%s')", username)
+func (db *Db) AddUser(username string, password string) (*Models.User, error) {
+	queryString := fmt.Sprintf("INSERT INTO users(username, password) VALUES('%s', '%s')", username, password)
 	user, err := db.GetUser(username)
 	if err == nil && user != nil {
 		return nil, errors.New("user is already exists")
@@ -31,5 +31,6 @@ func (db *Db) AddUser(username string) (*Models.User, error) {
 	_ = tag
 	return &Models.User{
 		Username: username,
+		Password: password,
 	}, nil
 }

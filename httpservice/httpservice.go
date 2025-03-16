@@ -41,6 +41,11 @@ func New(ctx context.Context, cfg *Config, strg *db.Db) (*Service, error) {
 			SignUp(strg),
 			"auth_handler",
 		},
+		"signin": Handler{
+			"/signin",
+			SignIn(strg),
+			"signin",
+		},
 	}
 	return service, nil
 }
