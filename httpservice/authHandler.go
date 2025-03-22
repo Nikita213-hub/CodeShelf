@@ -38,6 +38,14 @@ func SignUp(ua Models.IAuthStorageController) http.HandlerFunc {
 			Secure:   true,
 			Path:     "/",
 		}
+		cookie1 := http.Cookie{
+			Name:     "userId",
+			Value:    strconv.Itoa(newUser.Id),
+			HttpOnly: true,
+			Secure:   true,
+			Path:     "/",
+		}
+		http.SetCookie(w, &cookie1)
 		http.SetCookie(w, &cookie)
 		err = json.NewEncoder(w).Encode(&newUser)
 		if err != nil {
@@ -75,6 +83,14 @@ func SignIn(ua Models.IAuthStorageController) http.HandlerFunc {
 			Secure:   true,
 			Path:     "/",
 		}
+		cookie1 := http.Cookie{
+			Name:     "userId",
+			Value:    strconv.Itoa(user.Id),
+			HttpOnly: true,
+			Secure:   true,
+			Path:     "/",
+		}
+		http.SetCookie(w, &cookie1)
 		http.SetCookie(w, &cookie)
 		err = json.NewEncoder(w).Encode(user)
 		if err != nil {

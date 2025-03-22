@@ -11,27 +11,50 @@ import (
 
 func newSnippet(sc Models.ISnippetsStorageController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		payload := r.FormValue("codesn")
-
+		payloadCode := r.FormValue("codesn")
+		password := r.FormValue("password")
+		pLangId := r.FormValue("prog_lang_id")
+		pLangIdInt, err := strconv.Atoi(pLangId)
+		if err != nil {
+			http.Error(w, "Invalid programming language ID", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+		userId := r.Context().Value("userId")
+		var castedUserId int
+		v, ok := userId.(int)
+		if ok {
+			castedUserId = v
+		} else {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
 		//fmt.Println(f)
 		//file, handler, err := r.FormFile("form-id")
 		//if err != nil {
 		//	fmt.Println(err)
 		//}
 		//_ = file
-		//_ = handlerTimeline of the most recent commits to this repository and its network ordered by most recently pushed to.
+		//_ = handler
 		fp, err := utils.NewFile("go")
 		if err != nil {
+			http.Error(w, "Internal error while creating new file", http.StatusBadRequest)
 			fmt.Println(err)
+			return
 		}
 		_ = fp
-		err = utils.WriteToFile(fp, payload)
+		err = utils.WriteToFile(fp, payloadCode)
 		if err != nil {
+			http.Error(w, "Internal error while updating file", http.StatusBadRequest)
 			fmt.Println(err)
+			return
 		}
-		_, err = sc.NewSnippet(2, 2, "go", fp.Name())
+		_, err = sc.NewSnippet(castedUserId, pLangIdInt, password, fp.Name())
 		if err != nil {
+			http.Error(w, "Internal while creating new record in database", http.StatusBadRequest)
 			fmt.Println(err)
+			return
 		}
 	}
 }
