@@ -3,6 +3,7 @@ package httpservice
 import (
 	"context"
 	"github.com/Nikita213-hub/CodeShelf/db"
+	"github.com/Nikita213-hub/CodeShelf/middlewares"
 	"net/http"
 )
 
@@ -33,7 +34,7 @@ func New(ctx context.Context, cfg *Config, strg *db.Db) (*Service, error) {
 	service.Handlers = Handlers{
 		"hello_handler": Handler{
 			"/hello",
-			helloHandler,
+			middlewares.AuthMiddleware(helloHandler, strg),
 			"hello_handler",
 		},
 		"signup": Handler{
@@ -45,6 +46,16 @@ func New(ctx context.Context, cfg *Config, strg *db.Db) (*Service, error) {
 			"/signin",
 			SignIn(strg),
 			"signin",
+		},
+		"addSnippet": Handler{
+			"/snippets/add",
+			middlewares.AuthMiddleware(newSnippet(strg), strg),
+			"add_snippet",
+		},
+		"getSnippet": Handler{
+			"/snippets",
+			getSnippet(strg),
+			"get_snippet",
 		},
 	}
 	return service, nil

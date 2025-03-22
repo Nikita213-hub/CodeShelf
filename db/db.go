@@ -34,7 +34,7 @@ func NewDbService(ctx context.Context, cfg *Config) (*Db, error) {
 	var err error
 	connStr := fmt.Sprintf(`user=%s password=%s host=%s dbname=%s sslmode=%s`,
 		cfg.User, cfg.Pass, cfg.Host, cfg.Dbname, cfg.SslMode)
-	//connStr := fmt.Sprintf("user=postgres password=penis host=localhost dbname=code_shelf sslmode=disable") // EBAT YA DAUN, TUT NE NUZJNI BILI ZAPYATIE
+	//connStr := fmt.Sprintf("user=postgres password=penis host=localhost dbname=code_shelf sslmode=disable")
 	dbc.conn, err = pgx.Connect(ctx, connStr)
 	if err != nil {
 		return &Db{}, err

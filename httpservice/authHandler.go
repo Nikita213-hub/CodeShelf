@@ -9,19 +9,12 @@ import (
 	"time"
 )
 
-type IAuthStorageController interface {
-	AddUser(username string, password string) (*Models.User, error)
-	GetUser(username string) (*Models.User, error)
-	AddSession(sessionId int) error
-	GetSession(sessionId int) error
-}
-
 type AuthUserReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-func SignUp(ua IAuthStorageController) http.HandlerFunc {
+func SignUp(ua Models.IAuthStorageController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var usr AuthUserReq
 		err := json.NewDecoder(r.Body).Decode(&usr)
@@ -53,7 +46,7 @@ func SignUp(ua IAuthStorageController) http.HandlerFunc {
 	}
 }
 
-func SignIn(ua IAuthStorageController) http.HandlerFunc {
+func SignIn(ua Models.IAuthStorageController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var userData AuthUserReq
 		err := json.NewDecoder(r.Body).Decode(&userData)
