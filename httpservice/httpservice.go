@@ -57,6 +57,11 @@ func New(ctx context.Context, cfg *Config, strg *db.Db) (*Service, error) {
 			getSnippet(strg),
 			"get_snippet",
 		},
+		"uploadSnippet": Handler{
+			"/snippets/upload",
+			middlewares.AuthMiddleware(uploadSnippet(strg), strg),
+			"upload_snippet",
+		},
 	}
 	return service, nil
 }

@@ -11,7 +11,6 @@ import (
 
 func newSnippet(sc Models.ISnippetsStorageController) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		payloadCode := r.FormValue("codesn")
 		password := r.FormValue("password")
 		pLangId := r.FormValue("prog_lang_id")
 		pLangIdInt, err := strconv.Atoi(pLangId)
@@ -44,15 +43,55 @@ func newSnippet(sc Models.ISnippetsStorageController) http.HandlerFunc {
 			return
 		}
 		_ = fp
-		err = utils.WriteToFile(fp, payloadCode)
+		_, err = sc.NewSnippet(castedUserId, pLangIdInt, password, fp.Name())
+		if err != nil {
+			http.Error(w, "Internal while creating new record in database", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+	}
+}
+
+func uploadSnippet(sc Models.ISnippetsStorageController) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		payloadCode := r.FormValue("codesn")
+		snippetId, err := strconv.Atoi(r.FormValue("snippet_id"))
+		if err != nil {
+			http.Error(w, "Invalid snippet ID", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+		snippet, err := sc.GetSnippet(snippetId)
+		if err != nil {
+			http.Error(w, "Error occured while getting snippet", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+		userId := r.Context().Value("userId")
+		var castedUserId int
+		v, ok := userId.(int)
+		if ok {
+			castedUserId = v
+		} else {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+		if snippet.OwnerId != castedUserId {
+			http.Error(w, "U have no permission to edit this snippet", http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+		fp, err := utils.GetFile(snippet.FileName)
 		if err != nil {
 			http.Error(w, "Internal error while updating file", http.StatusBadRequest)
 			fmt.Println(err)
 			return
 		}
-		_, err = sc.NewSnippet(castedUserId, pLangIdInt, password, fp.Name())
+
+		err = utils.WriteToFile(fp, payloadCode)
 		if err != nil {
-			http.Error(w, "Internal while creating new record in database", http.StatusBadRequest)
+			http.Error(w, "Internal error while updating file", http.StatusBadRequest)
 			fmt.Println(err)
 			return
 		}

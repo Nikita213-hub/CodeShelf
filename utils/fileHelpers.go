@@ -24,6 +24,17 @@ func WriteToFile(filePointer *os.File, payload string) error {
 	return nil
 }
 
+func GetFile(fileName string) (*os.File, error) {
+
+	fp, err := os.Open(fileName)
+	defer fp.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return fp, nil
+}
+
 func GetFileContent(fileName string) (string, error) {
 	content, err := os.ReadFile(fileName)
 	if err != nil {
